@@ -1,0 +1,94 @@
+﻿坐标变换
+World Corrdinates
+==>
+Window Coordinates
+==>
+Device Coordinates
+(逻辑坐标)
+世界变换
+中间态坐标
+窗口视口变换
+(物理坐标)
+在默认情况下，3个坐标系是一致的。
+世界变换
+世界变换直接相关的函数：
+QPainter::setWorldMatrixEnabled
+启用、禁用世界变换
+QPainter::setWorldTransform
+设置世界变换
+QPainter::worldTransform
+获取当前
+QPainter::resetTransform
+重置为 QTransform()
+4个常用的函数
+QPainter::scale
+QPainter::shear
+QPainter::rotate
+QPainter::translate
+注：它们通过直接调用的 QTransform 的相应成员直接修改世界变换
+void QPainter::scale(qreal sx, qreal sy)
+{
+...
+    d->state->worldMatrix.scale(sx,sy);
+...
+}
+世界变换的两个马甲：
+QPainter::setTransform
+QPainter::transform
+void QPainter::setTransform(const QTransform &transform, bool combine )
+{
+    setWorldTransform(transform, combine);
+}
+废弃的函数(从Qt4.3开始，QTransform 取代了QMatrix 的位置，下列函数已不建议使用)：
+QPainter::setWorldMatrix
+QPainter::worldMatrix
+…
+窗口视口变换
+直接相关：
+QPainter::setViewTransformEnabled
+启用、禁用 视口变换
+QPainter::viewTransformEnabled
+
+QPainter::setViewport
+设置 视口（物理坐标）
+QPainter::setWindow
+设置 窗口（与视口是同一矩形，中间态坐标）
+该变换是简单的线性变换。
+复合变换
+窗口视口变换和世界变换的复合：
+QPainter::combinedTransform
+QTransform QPainter::combinedTransform() const
+{
+    Q_D(const QPainter);
+    return d->state->worldMatrix * d->viewTransform();
+}
+典型应用：对鼠标事件的响应中，将坐标从物理坐标变换成QPainter需要的逻辑坐标
+仿射变换、透射变换
+Qt4.3(包括)之前的 QMatrix 只支持仿射变换(Affine transformation)。
+平移(Translation)
+缩放（Scale）
+旋转（Rotation）
+剪切(Shear)
+QTransform 支持透射变换(perspective transformation)。
+m11
+m12
+m13
+m21
+m22
+m23
+m31 
+dx
+m32 
+dy
+m33
+变换关系：
+x' = m11*x + m21*y + dx
+ y' = m22*y + m12*x + dy
+ if (is not affine) {
+     w' = m13*x + m23*y + m33
+     x' /= w'
+     y' /= w'
+ }
+相关(有待学习)：
+射影几何学、仿射几何学、欧氏几何学
+

@@ -1,0 +1,46 @@
+Android NDK开发
+目录结构
+
+project/ #与原有的android项目一样的目录结构，仅多了一个jni用来存放native代码
+	jni/ #native代码存放处
+		Android.mk #用来生成和编译native代码的Makefile
+		Application.mk #可选提供的文件，可指定全局的编译标志和cpu架构等
+
+Android.mk参考
+一个文件可以声明多个目标
+
+---- sample ----
+LOCAL_PATH := $(call my-dir) #必须写，获得当前源码路径
+
+include $(CLEAR_VARS) #必须写，清除编译系统其他部分声明过的变量。
+
+LOCAL_MODULE    := hello-jni #本地目标，如果是动态库，编译系统会自己变化为libhello-jni.so。
+LOCAL_SRC_FILES := hello-jni.c #对应的源码文件
+
+include $(BUILD_SHARED_LIBRARY) #确定要生成目标的类型，此处为动态库
+---------------
+
+目标类型:
+  BUILD_SHARED_LIBRARY
+  BUILD_STATIC_LIBRARY
+
+
+LOCAL_ALLOW_UNDEFINED_SYMBOLS #在编译时，会强制链接所有symbol，对应ld的--no-defined-symbol标志
+
+LOCAL_C_INCLUDES 头文件
+编译标志
+LOCAL_CFLAGS
+LOCAL_CXXFLAGS
+LOCAL_CPPFLAGS
+LOCAL_LDLIBS
+
+LOCAL_STATIC_LIBRARYS
+LOCAL_SHARED_LIBRARYS
+
+
+Application.mk 可选，指定目标模块，CPU架构或者其他应用于所有模块的编译标志。
+
+如果使用C++，所有JNI函数一定要用extern "C"{}声明。看来JNI只支持C方法调用。
+
+
+

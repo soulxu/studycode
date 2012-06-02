@@ -1,0 +1,24 @@
+ACTION         一个时间活动的名字，比如add，当设备增加的时候
+KERNEL         在内核里看到的设备名字，比如sd*表示任意SCSI磁盘设备
+DEVPATH       内核设备录进，比如/devices/*
+SUBSYSTEM       子系统名字，比如sound,net
+BUS         总线的名字，比如IDE,USB
+DRIVER         设备驱动的名字，比如ide-cdrom
+ID           独立于内核名字的设备名字
+SYSFS{ value}       sysfs属性值，他可以表示任意
+ENV{ key}       环境变量，可以表示任意
+PROGRAM       可执行的外部程序，如果程序返回0值，该键则认为为真(true)
+RESULT         上一个PROGRAM调用返回的标准输出。
+NAME         根据这个规则创建的设备文件的文件名。注意：仅仅第一行的NAME描述是有效的，后面的均忽略。
+                                  如果你想使用使用两个以上的名字来访问一个设备的话，可以考虑SYMLINK键。
+SYMLINK       根据规则创建的字符连接名
+OWNER         设备文件的属组
+GROUP         设备文件所在的组。
+MODE         设备文件的权限，采用8进制
+RUN         为设备而执行的程序列表
+LABEL         在配置文件里为内部控制而采用的名字标签(下下面的GOTO服务)
+GOTO         跳到匹配的规则（通过LABEL来标识），有点类似程序语言中的GOTO
+IMPORT{ type}     导入一个文件或者一个程序执行后而生成的规则集到当前文件
+WAIT_FOR_SYSFS   等待一个特定的设备文件的创建。主要是用作时序和依赖问题。
+PTIONS         特定的选项： last_rule 对这类设备终端规则执行； ignore_device 忽略当前规则； ignore_remove 忽略接下来的并移走请求。
+           all_partitions 为所有的磁盘分区创建设备文件。

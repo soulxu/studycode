@@ -1,0 +1,247 @@
+模块：
+	模块入口函数与退出函数
+		module_init()
+		module_exit()
+
+	定义于位于linux/init.h，定义如下：
+		#define __define_initcall(level,fn,id) \
+				static initcall_t __initcall_##fn##id __used \
+				__attribute__((__section__(".initcall" level ".init"))) = fn
+
+	可知是通过二进制文件的section实现定义的。
+
+
+	初始化函数添加__init 可使内核在执行完初始化后是否所占用的内存资源。可添加与函数和数据。
+		#define __init          __section(.init.text) __cold notrace
+		#define __initdata      __section(.init.data)
+		#define __initconst     __section(.init.rodata)
+		#define __exitdata      __section(.exit.data)
+		#define __exit_call     __used __section(.exitcall.exit)
+
+	如果引用init section当中的函数与数据，需使用如下宏定义
+		#define __ref            __section(.ref.text) noinline
+		#define __refdata        __section(.ref.data)
+		#define __refconst       __section(.ref.rodata)
+
+	内核中的并发
+		内核代码必须是可重入的。
+
+	当前进程
+		在linux/sched.h中定义：
+		struct task_struct
+
+	内核符号表
+		如果需要导出什么符号，使用以下两个宏:
+		EXPORT_SYMBOL()
+		EXPORT_SYMBOL_GPL()
+
+	模块描述类宏：
+		模块所采用的协议
+		MODULE_LICENSE("GPL")
+		  
+		MODULE_AUTHOR
+		MODULE_DESCRIPTION
+		MODULE_VERSION
+		MODULE_ALIAS
+		MODULE_DEVICE_TABLE
+
+	错误处理
+		linux/errno.h 中定义了错误编码
+
+字符设备驱动程序
+设备编号
+	dev_t 32位数，12位主设备，20位次设备
+	MAJOR(dev_t dev)
+	MINOR(dev_t dev)
+
+	MKDEV(int major, int minor)
+
+字符设备编号分配
+	int alloc_chrdev_region()
+
+	内核中所有字符设备编号都存放于chrdevs当中!
+
+	该函数用来动态分配字符设备编号。该函数实现，是通过记录如下数据结构表示字符设备。其中chardevs存储了所有设备。CHRDEV_MAJOR_HASH_SIZE为255
+
+	static struct char_device_struct {
+		struct char_device_struct *next;
+		unsigned int major;
+		unsigned int baseminor;
+		int minorct;
+		char name[64];
+		struct cdev *cdev;              /* will die */
+	} *chrdevs[CHRDEV_MAJOR_HASH_SIZE];
+
+	函数中调用如下函数动态创建一个struct char_device_struct结构放入chrdevs中。
+
+	struct char_device_struct *
+	__register_chrdev_region(unsigned int major, unsigned int baseminor, int minorct, const char *name)
+
+文件操作
+	struct file_operations;
+	定义了设备文件操作方法
+
+
+	struct file; 
+	系统中每一个打开的文件对应一个file结构体，在open时创建，并传递给每一个该文件操作函数，在close时释放。
+	包含了文件状态，文件打开方式。还可以存储私有数据。
+
+	传入的文件已经检查过读写权限。驱动程序不必自己检查。
+
+	struct inode;
+	代表一个打开的文件描述符；inode当中的成员包含了，对应文件的字符设备信息。
+	包含了设备编号，设备结构体struct cdev;
+
+字符设备
+	struct cdev;
+	void cdev_init(struct cdev *cdev, struct file_operations *fops);
+
+
+	struct cdev {
+		struct kobject kobj;
+		struct module *owner;
+		const struct file_operations *ops;
+		struct list_head list; //用来存放打开的文件描述符struct inode，从cdev_purge函数推测出来的
+		dev_t dev;
+		unsigned int count;
+	};
+
+初始化cdev
+	用于初始化静态的cdev
+	void cdev_init(struct cdev *cdev, const struct file_operations *fops)
+	{
+		memset(cdev, 0, sizeof *cdev);
+		INIT_LIST_HEAD(&cdev->list);
+		kobject_init(&cdev->kobj, &ktype_cdev_default); //使用了设备对象模型，cdev属于kobject。
+		cdev->ops = fops;
+	}
+
+	用于直接动态生成一个cdev，与cdev_init功能相同，仅多了个动态分配内存给cdev
+	struct cdev *cdev_alloc(void)
+	{
+		struct cdev *p = kzalloc(sizeof(struct cdev), GFP_KERNEL);
+		if (p) {
+		        INIT_LIST_HEAD(&p->list);
+		        kobject_init(&p->kobj, &ktype_cdev_dynamic);
+		}
+		return p;
+	}
+
+	将cdev添加到“内核”当中，基本上没做什么事，核心在kobj_map
+	int cdev_add(struct cdev *p, dev_t dev, unsigned count)
+	{
+		p->dev = dev;
+		p->count = count;
+		return kobj_map(cdev_map, dev, count, NULL, exact_match, exact_lock, p); 
+	}
+
+	struct kobj_map *cdev_map;
+	整个char_dev.c中包含一个全局的kobj_map，看来所有字符设备的cdev都放入这里了
+
+	应该是初始化字符设备这个部分的时候调用的，初始化了一个cdev_map，还有貌似关于mmap或者shared memory相关的东西。
+	void __init chrdev_init(void)
+	{
+		cdev_map = kobj_map_init(base_probe, &chrdevs_lock);
+		bdi_init(&directly_mappable_cdev_bdi);
+	}
+
+	kobject相关位于linux/kobject.h lib/kobject.c当中
+	kobject只是简单的初始化数据结构
+
+	kobj_map相关位于linux/kobj_map.h driver/base/map.c
+	就存了255个probe，应该是也与只支持255个设备。
+	每个主设备编号，有一个链表。
+	struct kobj_map {
+		struct probe {
+		        struct probe *next;
+		        dev_t dev;
+		        unsigned long range;
+		        struct module *owner;
+		        kobj_probe_t *get;
+		        int (*lock)(dev_t, void *);
+		        void *data; //在字符设备当中，存放的是struct cdev
+		} *probes[255];
+		struct mutex *lock;
+	};
+
+	创建range个probe，并放入对应主设备编号的数组成员内，组成一个链表。
+	int kobj_map(struct kobj_map *domain, dev_t dev, unsigned long range, struct module *module, kobj_probe_t *probe,
+	int (*lock)(dev_t, void *), void *data)
+
+字符设备的销毁
+	void cdev_del(struct cdev *p);
+		cdev_umap()
+			kobj_unmap()
+		kobject_put()
+
+字符设备其他
+	cdev_get 增加引用
+	cdev_put 减少引用
+
+其他
+	可以看到从inode找到设备编号找到kobject知道cdev
+	其实从inode也可以获得cdev，可能函数要验证什么。
+	最后调用了file_operations当中的open。
+	不知道这个函数什么时候被注册的和注册到了哪里。
+	注释写道每次打开一个字符设备文件时都会调用该函数
+	static int chrdev_open(struct inode *inode, struct file *flip);
+
+	用户空间内存与内核空间内存拷贝
+	带有__user的参数，表示使用的是用户空间地址
+
+	内核中不可以直接访问用户空间地址
+
+	copy_to_user
+	copy_from_user
+!	当用户空间的页面不在内存中时，虚拟内存子系统会将该进程转入睡眠状态，直到页面被传送到期望的位置。
+	因此访问用户空间的任何函数都是可重入的。并且能并发。
+
+	__copy_to_user
+	__copy_from_user
+	不检查用户空间地址是否有效
+
+调试
+	printk_ratelimit()
+	当print信息超过一定阀值，该函数返回0，用于防止过量的print信息，可通过/proc/sys/kernel/print_ratelimit进行调整
+
+	print_dev_t
+	format_dev_t
+	打印设备编号
+
+	procfs
+		简单方式
+			typedef int (read_proc_t)(char *page, char **start, off_t off, int count, int *eof, void *data);
+			typedef int (write_proc_t)(struct file *file, const char __user *buffer, unsigned long count, void *data);
+			page: 用来输出的缓冲区
+			start: 位于缓冲区的偏移
+			eof: 没有数据返回时是设置为1
+			data: 驱动程序私有数据
+
+			通过下面函数注册
+			struct proc_dir_entry *create_proc_dir_entry *create_proc_read_entry(const char *name,
+		mode_t mode, struct proc_dir_entry *base,
+		read_proc_t *read_proc, void * data)
+
+		seq file方式
+			struct seq_operations {
+				void * (*start) (struct seq_file *m, loff_t *pos); //遍历的开始，返回遍历数据结构或者SEQ_START_TOKEN，错误返回ERR_PTR
+				void (*stop) (struct seq_file *m, void *v); //遍历的结束，做资源清理工作
+				void * (*next) (struct seq_file *m, void *v, loff_t *pos); //移动遍历指针，返回NULL，表示就结束
+				int (*show) (struct seq_file *m, void *v); //显示数据，使用seq_printf打印数据
+			};
+
+			实现该接口
+
+			还需实现 struct file_operations，使用seq提供的函数，seq_read, seq_lseek, seq_release，其中open需要自己实现。
+			最终使用proc_create_data，将proc文件与file_operations联系起来。
+
+内核数据结构-链表
+	struct list_head
+	是个双向循环链表
+	需要加入链表的数据结构，只需要包含一个struct list_head结构体就可以
+
+	链表通过包含的这个成员来定位数据结构 list_entry()->contain_of()
+
+
+
+

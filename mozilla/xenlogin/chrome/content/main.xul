@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://xenlogin/content/css/taskbar.css" type="text/css"?>
+
+<window id="main" sizemode="maximized" width="1440px" height="900px" title="Login" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" onload="load_page();">
+		<script>
+
+			const PREFS_CID = "@mozilla.org/preferences;1";
+			const PREFS_I_PREF = "nsIPref";
+			const LANG_PREF = "intl.accept_languages";
+			const DUMP_PREF = "browser.dom.window.dump.enabled";
+  			try {
+				var Pref = new Components.Constructor(PREFS_CID, PREFS_I_PREF);
+				var pref = new Pref( );
+				pref.SetCharPref(LANG_PREF, "zh-cn");
+				pref.SetBoolPref(DUMP_PREF, true);
+			} catch(e) {}
+			
+			window.fullScreen = "1";
+			
+		</script>
+
+		<script src="main.js" />
+		<browser id="main_browser" type="chrome" flex="1"/>
+		<hbox>
+			<button id="refresh" label="刷新" onclick="refresh_page();" image="chrome://xenlogin/content/images/refresh.png"/>
+			<button id="reboot" label="重启" onclick="reboot_system();"  image="chrome://xenlogin/content/images/reboot.png"/>
+ 			<button id="shutdown" label="关机" onclick="shutdown_system();"  image="chrome://xenlogin/content/images/shutdown.png"/>
+		</hbox>
+</window>

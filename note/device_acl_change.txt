@@ -1,0 +1,4 @@
+udev中包含acl规则，其中设定了需要进行acl控制的设备
+最后通过/lib/udev/udev-acl设置权限
+
+当用户切换时，/usr/lib/Consolekit/run-seat.d/udev-acl.ck运行，仍然调用/lib/udev/udev-acl对设备文件的acl进行更新，更新为当前用户

@@ -1,0 +1,49 @@
+
+button {
+	margin:0 !important;
+	border: 0 !important;
+	padding: 0 !important;
+	background-color: transparent;
+	color: #FFFFFF;
+	font-size: 12px;
+	-moz-appearance: none;
+	width: 108px !important;
+	height: 32px !important;
+} 
+
+button:hover
+{	
+	-moz-appearance: none;
+	background-position: top left;
+	margin:0 !important;
+	border-width: 10px 10px 10px 10px  !important;
+	border-color: #000000;
+	padding: 0 !important;
+	width: 108px !important;
+	height: 32px !important;
+	background:  url("chrome://xenlogin/content/images/Button.png");
+}
+ 
+button:active
+{	
+	-moz-appearance: none;
+	-moz-image-region: rect(16px 16px 32px 0px);
+	background-position: top left;
+	margin:0 !important;
+	border-width: 10px 10px 10px 10px  !important;
+	border-color: #000000;
+	padding: 0 !important;
+	width: 108px !important;
+	height: 32px !important;
+	background:  url("chrome://xenlogin/content/images/Button1.png");
+}
+
+hbox
+{	
+	background:  url("chrome://xenlogin/content/images/taskbar.png");
+	margin:0 !important;
+	border: 0 !important;
+	padding: 0 !important;
+	height:  32px !important;
+}
+

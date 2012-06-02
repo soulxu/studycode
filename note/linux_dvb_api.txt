@@ -1,0 +1,134 @@
+Linux DVB interface
+
+Demux 
+用途：硬件解复用
+设备路径： /dev/dvb/adapter0/demux0
+
+数据类型：
+dmx_output_t
+
+typedef enum
+{
+        DMX_OUT_DECODER,
+        DMX_OUT_TAP,
+        DMX_OUT_TS_TAP
+} dmx_output_t;
+
+DMX_OUT_TAP：将流输出到调用ioctl的demux设备上
+DMX_OUT_TS_TAP：将流输出到逻辑 DVR设备上 /dev/dvb/adapter0/dvr0 。输出一个ts流到该设备。并且复用所有设置了该标志的流。
+
+函数调用
+open: 在 /dev/dvb/adapter0/demux0 上使用，将会分配以后一个新的filter并返回一个handle用来持续的控制该filter。
+该函数的每一次返回的文件描述附，是一个单独filter的引用。
+
+/dev/dvb/adapter0/dvr0 是一个逻辑设备用来检索传输流。从该设备读取，将得到一个传输流，该流包含了所有设置了DMX_OUT_TS_TAP标志的filter的PES包。
+
+read()
+读取filtered中的数据。可能是secion或者PES数据。数据被存储在驱动内部的循环缓冲区中。
+
+当返回的是secion数据，驱动则总是返回完整的单独section（即使有足够的空间放入其他数据）。如果数据超过缓冲区大小则在下次调用时继续返回。
+
+内部缓冲默认为2*4096bytes（secion的两倍大小）
+
+为了能够读取，必须通过ioctl设置要过滤的secion或者PES。并指定DMX_START 或者ioctl时指定DMX_IMMEDIATE_START 标记。
+
+write()
+仅对/dev/dvb/adapter0/dvr0管用，还是在内部于物理demux设备关联
+
+ioctl()
+DMX_START 开始filter
+DMX_STOP 对应的停止
+
+DMX_SET_FILTER
+设置filter
+
+struct dmx_sct_filter_params
+{
+        uint16_t            pid; 
+        dmx_filter_t        filter;
+        uint32_t            timeout;
+        uint32_t            flags;
+#define DMX_CHECK_CRC       1
+#define DMX_ONESHOT         2
+#define DMX_IMMEDIATE_START 4
+};
+
+timeout：设置读取secion超时，0为永不超时
+flags：指定了是否CRC检查，仅读取一次，DMX_SET_FILTER后立即开始filter
+
+DMX_SET_PES_FILTER
+用来设置一个PES filter。传输流的目标必须设定，一个PES可以直接送入video decoder。如果该filter之前设置过，则会取消当前的filter。并清空缓冲区。
+
+DMX_SET_BUFFER_SIZE
+设置缓冲区大小，默认2*4096bytes
+
+DMX_GET_EVENT
+返回一个事件，必须在阻塞模式下。
+
+DMX_GET_STC
+设置当前系统STC system time counter？
+
+--------------------------------------------------------
+DVB Video Device
+这种设备提供MPEG2视频硬件解码，可通过 /dev/dvb/adapter0/video0 访问。
+该设备仅负责控制MPEG视频流解码，不负责将画面显示在TV或者显示器上。在PC上，这通常由video4linux设备负责，还负责scale和定义输出窗口。
+ioctl也处理SPU(sub picture unit)
+
+数据类型
+typedef enum {
+        VIDEO_FORMAT_4_3,
+        VIDEO_FORMAT_16_9
+} video_format_t;
+指定视频格式
+
+typedef enum {   
+        VIDEO_PAN_SCAN,   
+        VIDEO_LETTER_BOX, 
+        VIDEO_CENTER_CUT_OUT
+} video_display_format_t;
+当视频流和应用程序的显示格式不同时，需要指定。
+
+typedef enum {
+        VIDEO_SOURCE_DEMUX, 
+        VIDEO_SOURCE_MEMORY 
+} video_stream_source_t;
+指定视频源，可以是demux设备，也可以来自内存，来自内存这靠用户write写入数据。
+
+VIDEO_GET_CAPABILITIES
+获得视频能力
+
+VIDEO_SET_SYSTEM
+
+typedef enum {
+         VIDEO_SYSTEM_PAL, 
+         VIDEO_SYSTEM_NTSC, 
+         VIDEO_SYSTEM_PALN, 
+         VIDEO_SYSTEM_PALNc, 
+         VIDEO_SYSTEM_PALM, 
+         VIDEO_SYSTEM_NTSC60, 
+         VIDEO_SYSTEM_PAL60,
+         VIDEO_SYSTEM_PALM60
+} video_system_t;
+
+函数
+
+ioctl
+VIDEO_STOP
+停止当前流
+
+VIDEO_PLAY
+开始当前流
+
+VIDEO_FREEZE
+暂停当前流
+
+VIDEO_CONTINUE
+继续当前流
+
+VIDEO_SELECT_SOURCE
+
+VIDEO_SET_BLANK
+当流停止时清空屏幕
+
+
+

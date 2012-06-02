@@ -1,0 +1,12 @@
+#include "nsISupports.idl"
+//所有接口都必须集成自nsISupports接口
+
+[scriptable, uuid(a938f306-d249-4527-ac4b-2c05eafbf625)] //来自uuidgen程序的uuid，每个接口必须有一个
+
+
+//接口的描述，类c语法
+interface nsICcoss : nsISupports
+{
+	void reboot();
+	void shutdown();
+};

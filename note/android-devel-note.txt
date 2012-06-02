@@ -1,0 +1,293 @@
+Android development note
+
+应用程序基础
+Android应用程序
+	1.默认情况下，每个应用程序运行在自己的Linux进程当中，进程随程序的启动终止而创建和销毁
+	2.每个进程有自己的虚拟机，因此每个应用程序与其他程序是孤立的。
+	3.默认情况下，每个应用程序有一个唯一的用户id，以至于应用程序的数据仅被该程序访问
+
+	会尽量安排两个应用程序共享同一个用户id，为了保留系统资源，应用程序会运行在同一个linux进程，虚拟机内。
+
+
+android核心特征之一就是当你需要某一功能时，可以像系统请求启动提供该功能的应用程序。而不必自己再次开发该功能。
+
+因此应用程序也没有单独的入口点。
+
+应用程序主要有以下 四种组件
+	Activities
+		一个Activity就是一个可视的用户接口。Activity之间是互不依赖的。
+		每个activity有一个给定的默认窗口绘入，窗口也可能小于屏幕，浮动再其他窗口之上。
+		View是用来提供可视内容的，通过Activity.setContentView来将view置入activity的window当中。
+	Services
+		service没有可视用户见面，运行在后台。Service作为基类
+
+	Broadcast receivers
+		用来接受broadcast事件，如时区设置变化了，电池没电等信息。应用程序也可以广播事件。BroadcastReceiver作为基类。
+		Broadcast Receiver没有可视用户界面，但可以启动一个activity来对重要信息做出反应。也可以使用NotificationManager来提醒用户.Notification可以有多种方法，如播放铃声，震动等等。
+
+	Content providers
+		用来提供一组供其他应用程序访问的数据，数据可以使用任何系统提供的方式进行存储。
+		通过扩展ContentProvider实现provider.但应用程序更经常使用ContentResolver.
+
+
+Activating components: intents
+	content provider是被ContentResolver激活。
+	Activity, Serivce, BroadcastReceiver是被异步消息Intent激活。
+	Intent是一个存储消息内容的Intent对象
+
+几种激活各种组建的方法：
+	1.Activity可以通过传递一个Intent到Context.startActivity()或者Activity.startActivityForResult()来激活。
+	Activity可以通过getIntent()获得最初激活自己的Intent。通过onNewIntent()？
+
+	需要返回某些数据的Activity使用startActivityForResult()方法，数据通过onActivityResult()回调函数返回。
+
+	2.Service通过Context.startService()。android调用service的onStart()方法，并传递Intent
+
+	类似，可以使用Intent传递给Context.bindService()来持续连接一个服务.Service通过onBind()方法得知。
+
+	3.应用程序可以通过Intent初始化broadcast。Context.sendBroadcast(),Context.sendOrderedBroadcast()，和Context.sendStickyBroadcast(),android传递Intent并调用broadcastreciver的onReceive()方法。
+
+组建的关闭
+	ContentProvider仅当有ContentResolver的request时存在，broadcast recevier仅当负责广播消息时存在，没有明显的终止方法。
+
+	Activity使用Finish()方法关闭，关闭其他的Activity使用finishActivity()
+	Service使用stopSelf() or Context.stopService()
+
+	组建同样会被系统关闭。通常在回首内存时
+
+Manifest文件
+	每个应用程序都有一个manifest文件，被包含在android package当中。
+	AndroidManifest.xml
+	<activity>
+	<service>
+	<receiver>
+	<provider>
+
+	Activity, Service, ContentProvider如果没申明就不可以在系统中使用。
+	BroadcastReciver可以被动态创建
+
+Intent filters
+	Intent filter来告知android组建对什么样的Intent感兴趣。
+	一个组建可以多个Intent filters，如果没有任何intent filters,则只能被显式的intent激活
+	对于动态创建的broadcastreciver，直接实例化IntentFilter对象
+
+Activities 和 Tasks
+	一个Task是对用户来说是一个应用程序。是一组相关的activites，并在堆栈中排列。root activity通常是应用程序启动的activity，当转向另一个activity时，当前的activity被push到堆栈中。当新的activity退出时，旧的activity被pop出来。
+	堆栈包含对象，如果一个Task有多于同一个activity子类的实例，堆栈则保存该对象的多个实例，在堆栈中的activities从来不会被重新排列。
+	一个Task就是一个堆栈的activites,不是一个类也不是生命在Manifest文件中的元素，这里没有设置Task值的方法。task的值作为一个整体放入root activity当中。
+	所有堆栈中的activites作为一个整体。整个task作为一个整体被带到前台或者放入后台。
+	实例：当前有一个包含4个activities的stack。当用户点击HOME键，并从LAUNCHER启动一个新的应用程序，android则创建一个新的task，当用户再次返回HOME，并启动之前的应用程序，则讲之前包含4个activities的task放入前台。并显式该task顶部的activity。
+
+相关activities的task和activity在一个task中的行为，通过起始activity的intent对象设置的标志和<activity>当中设置的属性来控制。
+
+Affinites 和 tasks
+
+	在一个程序当中所有activities有各自的affinity。可以通过<activity>当中的taskAffinity属性设置。
+	只有两种情况下起作用：
+	1.被带有FLAG_ACTIVITY_NEW_TASK的intent启动时
+		默认情况下新打开的activity被放入调用startActivity()的activity所在的堆栈中。使用该标志，使系统将activity放入新的堆栈中。但是当有已存在的堆栈与当前activity的affinity相近，则放入该堆栈中。
+	2.allowTaskReparenting属性设置为true时
+		一个activity可以被移动到与自己affinity相同的堆栈中。如：一个属于旅行的程序的一个天气预报activity。这个activity与该程序中其他activity具有相同的affinity。你的activity启动了那个天气预报activity，此时天气预报activity属于你所在的堆栈。但当旅行程序的被启动时，天气预报activity将放入该堆栈并显式。
+	如果一个.apk文件包含多余一个用户视角的应用程序，可以使用affinity来关联。
+
+Launch modes
+	一共有四种启动模式，通过<activity>的launchmode设置。
+		standard
+		   位于哪个堆栈依赖affinity
+		singleTop
+		   位于哪个堆栈依赖affnitiy，但总是位于堆栈的顶端。如果当前activity位于栈顶，当又启动一个当前类型的activity，启动模式是singleTop时，则不创建一个新的实例。
+		singleTask
+		   总是位于堆栈的root,仅能一个实例
+		singleInstance
+		   总是位于堆栈的root，仅能一个实例。只有自己在task中，除此之外与singleTask相同
+
+		当有新的intent时，会调用目标activity的onNewIntent()回调。
+
+		如果activity被创建去handle一个新的Intent时，用户可以用back键回退到之前的activity。如果是将一个以存在的activity实例激活后，将无法使用back键回退到之间的activity实例。
+
+	Clearing the task
+	当用户离开该task一段时间后，系统会清除除root activity之外的所有activity。
+
+	有三个属性可以控制
+	alwaysRetainTaskState
+	永远保留所有activity
+	clearTaskOnLaunch
+	永远清除所有activity
+	finishonTaskLaunch
+	只对当前activity有效，当用户离开当前activity将被清除，堆栈其余activity还在。
+
+	FLAG_ACTIVITY_CLEAR_TOP将会删除目标Task中与目标类型相同的activity之上的所有activity
+
+Processes and Threads
+	默认一个应用程序的所有组建运行在一个进程当中。
+	然而也可以设置组建所运行的进程。并且创建附加的线程。
+
+	进程
+	activity
+	service
+	receiver
+	provider
+	各有一个process属性用来指定一个运行的进程。
+	<application>也有一个process可以设置默认值
+
+	线程
+	使用标准的Thread。还有其他方便管理线程的 Looper：消息循环. Handler:处理消息. HandlerThread:设置一个消息循环线程 
+
+	RPC
+	所有远程过程调用是同步的（block）
+	使用IDL语言描述接口，使用aidl工具生成java接口定义。
+
+	线程安全
+
+组件生命周期
+activity生命周期
+	三种状态
+	active
+		位于前台，响应用户操作
+	paused
+		被其他非全屏的activity覆盖，activtiy仅是暂时暂停，保留所有状态和成员信息并保留在窗口管理器上。但是当系统内存过少的时候会被系统终止。
+	stopped
+		是在完全不可见时，仍然保留所有状态和成员信息，经常被系统终止并回收内存。
+
+	当activity被paused或者stoped时，系统将其终止，并调用他们的finish()回调或者直接杀掉。
+	void onCreate(Bundle savedInstanceState) 
+		void onStart() 
+		void onRestart() 
+			void onResume() 
+				 onRestoreInstanceState() 非声明周期，仅在系统需要将其终止时调用
+				 onSaveInstanceState() 同上
+			void onPause() 启动其他activity时，并且是同一个process
+		void onStop() 位于堆栈顶端被用户点击back时，或者启动其他activity，并不是同一个process或者堆栈
+	void onDestroy()
+
+	完整声明周期 onCreate - onDestroy
+	可视生命周期 onStart - onStop
+	前台声明周期 onResume - onPause
+
+service生命周期
+	通过以下方法启动
+	Context.startService()
+	Context.stopService()
+
+	service通过一下方法终止自己
+	Service.stopSelf()
+	Service.stopSelfResult
+
+	连接到service的方法
+	Context.bindService
+	Context.unbindServicez知道最有一个binding断开才实际终止Service
+
+	声明周期状态方法
+	void onCreate() startService和bindService都会调用
+	void onStart(Intent intent) 仅在startService()时调用
+	void onDestroy()
+
+	当有客户端连接到Service时调用
+	onBind
+	onRebind
+	onUnbind
+
+Broadcast recevier声明周期
+	收到消息时调用onReceive
+	onReceive应该异步执行内容，如果使用线程执行，onReceive返回后，进程很有可能被杀除，应该使用Service来执行具体能容并保证Process不被清除
+
+进程生命周期
+	android会为每个进程安排入一个重要层次，这依赖于运行在该进程的组件和这些组件的状态。级别最低的将被清除。一共有5个级别
+
+	1.前台进程
+		用户交互中
+		存在一个与用户交互连接的服务
+		Service对象在执行onCreate, onStart, onDestroy
+		BroadcastReceiver执行onReceive
+	2.可视进程：没有任何前台组件，但仍能影响用户屏幕上的内容。
+		存在一个非前台activity，但仅被对话框覆盖。
+		存在一个service与可视的activity连接。
+	3.服务进程
+		被startService启动的服务
+	4.背景进程 没有任何可视的activity,这些进程按照LRU（least recently used)，最近被用户使用的进程最后被删除
+	5.空进程 没有任何活动组件的进程，它存在的意义仅是为了下次启动程序加速。
+
+	android会尽量把进程的级别排高，如进程存在一个服务和一个可见的activity，则算为级别2
+
+	被其他进程依赖的进程也将具有依赖它的进程更高的优先级
+
+
+Intent Objects
+Component name
+	接受intent的组建名称，可选的，如果设定了可以指定接收intent的特定对象。如果未指定，android会通过其他信息找到合适的接受对象
+
+Action
+	一个字符串描述的动作行为。Intent 类中定义了大量的action常量，也可以自定义action
+
+Data
+	数据的URI
+	setData 仅设置URI
+	setType 仅设置类型
+	setDataAndType
+
+
+Category
+	接收组件的类型,Intent类定义了全部的分类
+
+Extras
+	可以传递Key-value值
+
+Flags
+	Intent 类中定义了一些标志，用来改变activity的启动方式。
+
+Intent filters
+一个filter就是一个IntentFilter类，系统从AndroidManifest.xml中读取<intent-filter>
+
+filter必须过滤Action, Data, Category三种类型的filter，必须三种全部通过才算匹配此Intent
+filter列表不该为空，如果为空，将不能匹配任何intent
+Action test
+	一个Intent的Action必须匹配Filter的Action列表中的一项, 才能通过, 如果Intent或
+    组件的Filter没有指定Action, 会导致下两个结果:
+    *.  如果组件的Intent Filter没有指定任何Action, 那么所有Intent都将不通过测试.
+    *.  但另一方面,  如果Intent没有指定Action, 则它将通过测试, 即使组件的Intent
+        Filter没有指定任何Action.
+
+Category test
+	一个Intent如果要通过测试, 则它包含的所有category都必须通过Filter的category列表
+    中的一项. 因此, 如果一个Intent没有category, 它就总是可以通过测试. 但有一个
+    例外的情况: 对于传递给Activity(调用startActivity())的隐式Intent, 系统默认它
+    带有一个 android.intent.category.DEFAULT 的category, 所以Activity的Intent Filter
+    必须包含一项 android.intent.category.DEFAULT, 才能使这个Intent通过测试. 
+    不过如果Activity的Intent Filter带有 android.intent.action.MAIN 和
+    android.intent.category.LAUNCHER , 就不再需要包含android.intent.category.DEFAULT 了.
+
+Data test
+	<intent-filter . . . >
+        <data android:mimeType="video/mpeg" android:scheme="http" . . . /> 
+        <data android:mimeType="audio/mpeg" android:scheme="http" . . . />
+        . . .
+    </intent-filter>
+    Data测试主要是测URI和数据类型(mimeType), URI的形式大概如下:
+        scheme://host:port/path
+    比如:
+        http://www.douban.com:8080/people
+    data filter将URI分成多个属性, 如下:
+        <data android:host="string"
+            android:mimeType="string"
+            android:path="string"
+            android:pathPattern="string"
+            android:pathPrefix="string"
+            android:port="string"
+            android:scheme="string" />
+    系统只比较出现的URI属性, 比如Data Filter只指定android:scheme, 那么所有包含
+    这个scheme的URI都可以匹配这个Filter.
+
+    Data的测试规则如下:
+    *.  如果一个Intent没有包含URI和数据类型, 那么只当Data Filter也没有包含任何URI
+        和数据类型时才能通过.
+    *.  如果一个Intent包含URI但没有包含数据类型(并且数据类型不能从URI推断出来), 
+        那么只当Intent的URI与Filter的URI匹配, 并且Filter也没有数据类型时才能通过.
+    *.  如果一个Intent包含数据类型但没有包含URI, 那么只当Filter包含同样的数据
+   amp;nbsp;    类型并且没有包含URI时才能通过.
+    *.  如果一个Intent即包含URI也包含数据类型(或可以从URI推断出数据类型), 那么
+        当它匹配Filter的数据类型时通过数据类型部分的测试, 当它匹配Filter的URI时
+        通过URI部分的测试; 
+        如果Intent的URI是content: 或 file: , 并且Filter没有指定URI时通过URI测试,
+        换名话说, 一个Filter只列出数据类型, 则假定支持content: 或 file: 类型的URI.
+
+

@@ -1,0 +1,15 @@
+QtStyle
+主要用来修改Style的参数，如背景图，边框宽度，颜色等。
+控件的绘制由控件本身执行，控件通过QStyle的参数设定来绘画控件。
+
+int QStyle::pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0 ) const [pure virtual]
+提供一些控件部件的大小，如滚动条的长度等
+
+void QStyle::polish ( QPalette & palette ) [virtual]
+改变palette的设置
+
+void QStyle::polish ( QWidget * widget ) [virtual]
+每个控件创建之后显示之前调用
+
+void QStyle::drawPrimitive ( PrimitiveElement element, const QStyleOption * option, QPainter * painter, const QWidget * widget = 0 ) const [pure virtual]
+绘画一些原始部件如一些Indicator

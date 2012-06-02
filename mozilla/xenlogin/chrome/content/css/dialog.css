@@ -1,0 +1,57 @@
+/* need suitable size background images for button and dialog */
+
+button {
+	margin:0 !important;
+	border: 0 !important;
+	padding: 0 !important;
+	background-color: transparent;
+	color: #000000;
+	font-size: 12px;
+	width: 90px !important;
+	height: 28px !important;
+	-moz-appearance: none;
+	background:  url("chrome://xenlogin/content/images/Button4.png") center no-repeat;
+} 
+
+button:hover
+{	
+	-moz-appearance: none;
+	background-position: top left;
+	margin:0 !important;
+	border-width: 10px 10px 10px 10px  !important;
+	border-color: #000000;
+	padding: 0 !important;
+	background:  url("chrome://xenlogin/content/images/Button3.png") center no-repeat;
+}
+ 
+
+button:active
+{	
+	-moz-appearance: none;
+	-moz-image-region: rect(16px 16px 32px 0px);
+	background-position: top left;
+	margin:0 !important;
+	border-width: 10px 10px 10px 10px  !important;
+	border-color: #000000;
+	padding: 0 !important;
+	background:  url("chrome://xenlogin/content/images/Button2.png") center no-repeat;
+}
+
+
+dialog
+{
+	-moz-appearance: none;
+	background:  url("chrome://xenlogin/content/images/float.png") no-repeat;
+	color:#FFFFFF
+}
+
+.dialog-button {
+	border: 2px !important;
+	margin-right: 5px;
+}
+
+description {
+	-moz-appearance: none;
+	-moz-box-align: start; /* move contents to the bottom */
+}
+

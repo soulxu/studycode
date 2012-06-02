@@ -1,0 +1,5 @@
+#dbus 服务文件
+[D-BUS Service]
+Name=com.soulxu.test
+Exec=/usr/bin/test.py
+User=root

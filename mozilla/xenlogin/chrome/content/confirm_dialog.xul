@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://xenlogin/content/css/dialog.css" type="text/css"?>
+
+<dialog id="main_dlg"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        buttons="cancel,accept"
+		buttonlabelcancel="取消"
+		buttonlabelaccept="确定"
+        ondialogaccept="return do_ok();"
+        ondialogcancel="return do_cancel();"
+		onload="load_page();"
+		title="登录"
+		
+>
+
+<script>
+
+function load_page() {
+	dump("load page\n");
+
+	var desc = document.getElementById("desc");
+	desc.value = window.arguments[0].inn.description;
+	//window.title = window.arguments[0].inn.name;
+	var main_dlg = document.getElementById("main_dlg");
+	main_dlg.title = window.arguments[0].inn.name;
+}
+
+function do_ok() {
+	window.arguments[0].out = true;
+	return true;
+}
+
+function do_cancel() {
+	window.arguments[0].out = false;
+	return true;
+}
+</script>
+<description id="" value="   " height="1px;"/>
+<description id="desc"/>
+</dialog>

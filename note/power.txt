@@ -1,0 +1,7 @@
+gnome-power-manager 电源管理
+
+upower 设备状态
+
+consolekit 统计设备可否使用
+
+pm-utils 实际执行 直接通过sysfs

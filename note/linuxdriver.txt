@@ -1,0 +1,64 @@
+模块：
+	模块入口函数与退出函数
+		module_init()
+		module_exit()
+
+	定义于位于linux/init.h，定义如下：
+		#define __define_initcall(level,fn,id) \
+				static initcall_t __initcall_##fn##id __used \
+				__attribute__((__section__(".initcall" level ".init"))) = fn
+
+	可知是通过二进制文件的section实现定义的。
+
+
+	初始化函数添加__init 可使内核在执行完初始化后是否所占用的内存资源。可添加与函数和数据。
+		#define __init          __section(.init.text) __cold notrace
+		#define __initdata      __section(.init.data)
+		#define __initconst     __section(.init.rodata)
+		#define __exitdata      __section(.exit.data)
+		#define __exit_call     __used __section(.exitcall.exit)
+
+	如果引用init section当中的函数与数据，需使用如下宏定义
+		#define __ref            __section(.ref.text) noinline
+		#define __refdata        __section(.ref.data)
+		#define __refconst       __section(.ref.rodata)
+
+	内核中的并发
+		内核代码必须是可重入的。
+
+	当前进程
+		在linux/sched.h中定义：
+		struct task_struct
+
+	内核符号表
+		如果需要导出什么符号，使用以下两个宏:
+		EXPORT_SYMBOL()
+		EXPORT_SYMBOL_GPL()
+
+	模块描述类宏：
+		模块所采用的协议
+		MODULE_LICENSE("GPL")
+		  
+		MODULE_AUTHOR
+		MODULE_DESCRIPTION
+		MODULE_VERSION
+		MODULE_ALIAS
+		MODULE_DEVICE_TABLE
+
+	错误处理
+		linux/errno.h 中定义了错误编码
+
+字符设备驱动程序
+设备编号
+	dev_t 32位数，12位主设备，20位次设备
+	MAJOR(dev_t dev)
+	MINOR(dev_t dev)
+
+	MKDEV(int major, int minor)
+
+注册设备编号
+int register_chrdev_region(dev_t first, unsigned int count, char *name);
+int alloc_chrdev_region(dev_t *dev, unsigned int firstminor, unsigned int count, char *name);
+
+void unregister_chardev_region(dev_t first, unsigned int count);
+

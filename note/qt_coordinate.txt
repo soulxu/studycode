@@ -1,0 +1,44 @@
+QT坐标系统
+
+World Coordinates 逻辑坐标
+   世界变换
+Window Coordinates 中间态坐标
+   窗口视口变换
+Device Coordinates 物理坐标
+
+
+世界变换
+QPainter::setWorldMatrixEnabled
+QPainter::setWorldTransform
+QPainter::worldTransform
+QPainter::resetTransform
+
+可以直接使用：
+    QPainter::scale
+    QPainter::shear
+    QPainter::rotate
+    QPainter::translate
+这几个函数直接调用worldTransform相关函数进行.
+
+
+窗口视口变换
+QPainter::setViewport
+QPainter::setWindow
+
+QPainter坐标默认是原点(0, 0)。
+
+视口使用物理坐标。
+窗口使用物理坐标。
+
+在Widget当中，视口和窗口的默认大小随Widget的大小变化。默认等同于Widget的大小。并且原点都为(0,0)Widget左上角
+
+如果在320x200的widget中进行绘图，默认的视口和窗口大小都为320x200.
+如果将窗口设置成(-50, -50, 100, 100)，则窗口的(-50, -50)对应视口的(0, 0)，窗口的(50, 50)对应视口的(320, 200)。
+
+
+视口和窗口的变换是通过两个坐标系的映射实现变换。
+
+而使用世界坐标系变换，是将坐标系平移，缩放，旋转等等。
+
+QMatrix已经被QTransform替代
+

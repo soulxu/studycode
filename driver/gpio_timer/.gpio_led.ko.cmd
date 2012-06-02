@@ -1,0 +1,1 @@
+cmd_/mnt/gpio_timer/gpio_led.ko := arm-unknown-linux-gnueabi-ld -EL -r  -T /root/ixmpp/ixmpp/study/mpbox/targets/mini6410_0.1/rootfs/usr/src/linux-2.6.36-mini6410/scripts/module-common.lds --build-id  -o /mnt/gpio_timer/gpio_led.ko /mnt/gpio_timer/gpio_led.o /mnt/gpio_timer/gpio_led.mod.o

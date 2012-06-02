@@ -1,0 +1,11 @@
+#!/bin/bash
+
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t tmpfs tmpfs /dev
+mkdir /dev/shm
+mount -t tmpfs shm /dev/shm
+mount -t tmpfs tmpfs /var/run/
+mount -t tmpfs tmpfs /tmp
+
+

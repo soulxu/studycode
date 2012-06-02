@@ -1,0 +1,5 @@
+窗口管理器 监听SubstructureRedirectMask 只能有一个程序可以监管该事件。通常窗口管理器监听root窗口的SubstructureRedirectMask
+
+该Mask可以接受到 MapRequest CirulateRequest, ConfigureRequest事件。
+如MapRequest事件，窗口管理器可以通过事件参数进行调整，最后再用合适的参数调用XMapWindow
+

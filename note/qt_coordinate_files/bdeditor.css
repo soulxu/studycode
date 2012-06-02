@@ -1,0 +1,16 @@
+.ToolbarContainer{border:solid 1px #A9CCDF;}
+.EditorContainer{border:solid 1px #DDDDDD; border-top:solid 2px #EDEDED;}
+.ToolbarStrip{background:url(bdeditor/bgStrip.gif) repeat-x left top; padding:0px; }
+.ToolbarItem{zoom:1}
+.ToolbarItem .img{background:url(bdeditor/strip.gif) no-repeat; border:none; margin:0 2px 2px 0;padding-left:24px;/*width:24px;*/ height:24px;line-height:24px;padding-right:5px;cursor:default !important; }
+.binding{background:#dff1ff url(bdeditor/bgItemActive.gif) repeat-x left top; }
+.binding .img{margin:0; border:solid 1px #B3B3B3;}
+.active{background:#dff1ff url(bdeditor/bgItemActive.gif) repeat-x left top; }
+.active .img{margin:0; border:solid 1px #B3B3B3;}
+.mouseover{background:#dff1ff url(bdeditor/bgItemActive.gif) repeat-x left top;}
+.mouseover .img{margin:0; border:solid 1px #808080; border-top-color: #FFFFFF; border-left-color: #FFFFFF;}
+.mousedown{background:#dff1ff url(bdeditor/bgItemActive.gif) repeat-x left top;}
+.mousedown .img{margin:0; border:solid 1px #B3B3B3; border-right-color: #FFFFFF; border-bottom-color: #FFFFFF;}
+.disabled{opacity:0.30; filter:gray() alpha(opacity=30); zoom:1;}
+.ToolbarItem .Smiley{background-position: 4px -1276px;padding-top:1px}
+.ToolbarItem .Lightfont{background-position: 5px -2140px;padding-top:1px}

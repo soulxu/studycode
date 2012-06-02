@@ -1,0 +1,14 @@
+Source: xenlogin
+Section: unknown
+Priority: extra
+Maintainer: Jin Xiaoning <jinxiaoning@ccoss.com.cn>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.1
+Homepage: http://www.ccoss.com.cn
+
+Package: xenlogin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, xulrunner-1.9.2
+Description: A CCOSS tool for login xen desktop.
+  A CCOSS tool for logining xen desktop. 
+

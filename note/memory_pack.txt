@@ -1,0 +1,74 @@
+内存对齐
+
+一般编译器会按照所在平台的对齐方式对数据进行修改以符合特定平台的内存对齐要求。
+
+如x86是以4为倍数的内存地址对齐。
+
+如：
+struct Test {
+  char c1; //编译器会扩展该字段为4字节，因此又3字节仅是填充用
+  int i;
+  char c2; //同上
+};
+
+因此sizeof(struct Test) 为 8;
+
+使用#pragma pack()可以修改对齐边界
+
+如：
+#pragma pack(1)
+struct Test {
+  char c1;
+  int i;
+  char c2;
+};
+#pragma pack()
+
+
+要求按照1字节对齐，因此sizeof(struct Test)为6
+
+！！！！按照#pragma pack指定的数值和这个数据成员自身长度中，比较小的那个进行对齐。
+
+#pragma pack 指令的一般语法形式为：#pragma pack( [ [ { push | pop}, ] [  identifier, ] ] [ n ] ).push表示把当前程序中的对齐字节数压入到编译器栈中，pop表示弹出编译器栈中的对齐字节数并把它做为当前程序的对齐字节数。至于 identifier 的用法就是为了更好地以更容易理解的形式保存和恢复，MSDN中有详细的说明和示例。
+
+功能类似，gcc提供的扩展
+__attribute__((aligned(8))) 
+但可以实施到具体成员身上
+
+以下是sh4平台下的问题
+------------------------------------------------------------------------------
+#include <stdio.h>
+
+
+#pragma pack(1)
+struct Data {
+        char c1;
+        int i;
+        char c2;
+};
+#pragma pack()
+
+int main() {
+        struct Data d;
+        printf("struct Data size: %d\n", sizeof(d));
+
+        d.c1 = 1;
+
+        // 获得的地址不是4的整数倍
+        int *ip = (int *)&(d.i);
+
+        // 对此地址进行访问，造成未对齐内存空间访问。
+        *ip = 33;
+        printf("ip: %x, %d - %x\n", ip, ( (int)ip % 4), &(d.i));
+
+        // 但通过结构体访问却不会有问题。
+        d.i = 0xffffffff;
+
+        d.c2 = 2;
+
+
+        printf("struct Data: %d, %d, %d\n", d.c1, d.i, d.c2);
+        printf("%p\n%p\n%p\n", &(d.c1), &(d.i), &(d.c2));
+        return 0;
+}
+---------------------------------------------------------------------------

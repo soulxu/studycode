@@ -1,0 +1,7 @@
+# Begin /etc/inittab
+
+::sysinit:/etc/sysinit
+
+::respawn:/sbin/udevd --daemon
+
+# End /etc/inittab

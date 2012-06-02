@@ -1,0 +1,16 @@
+最初Unix IPC包括：管道、FIFO、信号；
+管道：
+	匿名管道 pipe(); pipe[0] 读，pipe[1]写。shell管道可以通过这个实现。只能用来父子进程通信
+	popen();pclose();是标准c库提供的管道函数，省去了自己fork子进程之类的操作。
+FIFO: 
+	命名管道 mkfifo()；mode来设定管道读写权限。管道文件被删除后，还在打开中的该管道文件描述符仍然可用。
+	mknod();XSI扩展标准，linux支持，用该系统调用创建设备文件，FIFO, socket等特殊文件。
+
+	*与匿名管道一样，当以写入方式打开管道时没有其他进程为了读取打开该管道时，触发SIGPIPE
+
+	1.命名管道可以用来做filter，在进程间过滤数据。
+	2.命名管道可以用来做client server间的通信。server创建一个well-known管道，client像该管道写数据。但server无法判断是哪个客户端发来的消息，只有client在写入数据时包含自己的进程id。server再创建一个包含client进程id的管道来单独与client通信。当client崩溃退出时，server可以通过SIGPIPE得知（但貌似无法得知具体哪个client崩溃退出）。当所有client都关闭后，server会得到well-known管道的EOF标识，而退出，解决这个方法只好使用读写方式打开well-known管道。
+信号：要注意信号窗口，就是在设定信号处理函数前，信号发生了，则错过了信号。
+
+System V IPC包括：System V消息队列、System V信号灯、System V共享内存区；
+Posix IPC包括：	Posix消息队列、Posix信号灯、Posix共享内存区。

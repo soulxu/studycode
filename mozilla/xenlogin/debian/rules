@@ -1,0 +1,109 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+
+T_NAME=xenlogin
+TARGET_=$(CURDIR)/debian/$(T_NAME)
+
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	# Add here commands to configure the package.
+
+	touch configure-stamp
+
+
+build: build-stamp
+
+build-stamp: configure-stamp  
+	dh_testdir
+
+	# Add here commands to compile the package.
+	# $(MAKE)
+	#docbook-to-man debian/xenlogin.sgml > xenlogin.1
+
+	touch $@
+
+clean: 
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+
+	# Add here commands to clean up after the build process.
+	# $(MAKE) clean
+
+	dh_clean 
+	
+	rm    -rfv    $(TARGET_)/usr/bin/$(T_NAME)
+	rm	 -rfv    $(TARGET_)/usr/share/$(T_NAME)
+	rm   -rfv    $(TARGET_)/etc/xen-server-address.conf
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep  
+	dh_installdirs
+
+	# Add here commands to install the package into debian/xenlogin.
+	# $(MAKE) DESTDIR=$(CURDIR)/debian/xenlogin install
+	
+	mkdir    -p    $(TARGET_)/usr/share/$(T_NAME)
+	mkdir    -p    $(TARGET_)/etc/
+	mkdir    -p    $(TARGET_)/usr/bin
+
+	cp    -rfv   ./$(T_NAME)    $(TARGET_)/usr/bin
+	cp    -rfv    ./chrome    $(TARGET_)/usr/share/$(T_NAME)
+	cp    -rfv    ./defaults   $(TARGET_)/usr/share/$(T_NAME)
+	cp    -rfv    ./extensions  $(TARGET_)/usr/share/$(T_NAME)
+
+	cp    -vfr    ./application.ini    $(TARGET_)/usr/share/$(T_NAME)
+	cp   -vfr    ./chrome/content/conf/xen-server-address.conf    $(TARGET_)/etc/
+
+	find $(TARGET_)/usr/share/$(T_NAME) -type d -name ".svn" | xargs -i{} rm -vr {} 2&>1 > /dev/null
+
+# Build architecture-independent files here.
+binary-indep: install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
+	dh_installdocs
+	dh_installexamples
+#	dh_install
+#	dh_installmenu
+#	dh_installdebconf
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_python
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_perl
+#	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

@@ -1,0 +1,3 @@
+udev rules 95-keymap 通过/lib/udev/keymap进行键映射
+
+/etc/acpi/event监听按键，执行相应动作

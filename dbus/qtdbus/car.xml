@@ -1,0 +1,28 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/soulxu/dbus/qt/car">
+	<interface name="com.soulxu.dbus.qt.car">
+		<method name="startup" >
+			<arg  type="i" name="isok" direction="out"/>
+		</method>
+		<method name="stop" />
+		<method name="speed">
+			<arg type="i" name="ini" direction="in" />
+			<arg type="a(ss)" name="outp" direction="out" />
+			<annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="StringMapList"/>
+		</method>
+		<method name="test">
+			<arg type="(ii)" name="dii" direction="out"/>
+			<annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="DoubleInt" />
+		</method>
+		<method name="test1">
+                        <arg type="a(ii)" name="adii" direction="out"/>
+                        <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="DoubleIntList" />
+                </method>
+		<signal name="stoped">
+                        <arg type="a(ii)" name="adii" directon="in"/>
+                        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="DoubleIntList" />
+                </signal>
+		
+	</interface>
+</node>

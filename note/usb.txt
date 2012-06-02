@@ -1,0 +1,25 @@
+EHCI: Enhanced Host Control Interface增强主机控制接口
+  INTEL用于USB2.0告诉主机
+UHCI: Universal Host Control Interface 通用主机
+  用于全速与低速USB系统
+  硬件的要求相对较少，但对系统的处理能力与软件的开发要求相对要高
+OHCI: Open Host Control Interface开放主机控制接口
+  用于全速与低速USB系统
+  把较多的功能定义在硬件中，软件需要处理的内容就相对容易，对系统的处理能力和系统资源的要求较低
+
+
+sysfs 中的usb设备
+/sys/bus/usb/devices/usb5/
+为每一个usb总线分配了一个编号。第一个usb设备是root hub。并且root hub与host control绑定在一起的。
+|
+   /sys/bus/usb/devices/usb5/5-0:1.0
+   表示usb总线中，第一个设备总是root hub
+|
+   /sys/bus/usb/devices/usb5/5-1
+   位于第一个端口的设备
+   |
+       /sys/bus/usb/devices/usb5/5-1/5-1:1.0
+        端口第一个配置的第0个接口
+
+
+usb 协议中，除了通用的软硬件电气接口规范等，还包含了各种各样的Class 协议，用来为不同的功能定义各自的标准接口和具体的总线上的数据交互格式和内容。

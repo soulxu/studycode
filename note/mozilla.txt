@@ -1,0 +1,93 @@
+firefox 定制
+	一种是通过userChrome.css进行定制，可修改见面样式，还可以通过样式使某部分不显示
+	perf.js 是软件的默认配置，可以修改一些配置选项
+
+	另一种直接修改firefox源码，firefox完全通过xul和js编写的，所以修改firefox目录下的chrome/browser.jar文件
+
+firefox 扩展
+
+	firefox扩展的一般目录结构
+	ext/
+		chrome/
+			content/
+				main.xul	#按照chrome.manifest中的设定，存放相应的界面xul，js脚本之类的资源
+		chrome.manifest		#chrome方式资源定位的描述文件，定义了如何通过chrome资源定位访问到指定文件
+		install.rdf			#描述扩展，如作者，厂商，版本，扩展的类型（有主题，程序），要求的firefox版本
+
+	当开发完成之后，就可以将ext整个目录用zip打包，修改扩展名为xpi，就可以让firefox安装使用了。
+
+
+	main.xul
+		是用来描述界面的xul，使用xml语言，其中也可以嵌入js脚本
+
+	*.js
+		主要的程序逻辑功能还是放入js文件当中，然后在main.xul中进行引用
+
+	chrome.manifest
+		可描述多种类型如:content, overlay, locale
+		content: 资源文件
+		overlay: 覆盖原有某部分内容，如覆盖firefox浏览器的状态栏，添加扩展所需的内容。
+		locale: 国际化资源的定位
+
+国际化
+	采用xml的方式进行国际化。
+	首先需要在chrome.manifest当中，指定locale资源位置，然后通过*.dtd和.properties文件读取本地化的文本
+
+	在xul中引用的国际化文本，使用dtd文件
+	在程序中，如js脚本中引用国际化文本，使用properties文件
+
+mozilla 平台开发
+	firefox和thunderbird等应用程序，全是基于mozilla平台进行开发的。mozilla平台主要使用xul,xpcom,npruntime等方式进行开发。
+
+	xpcom和npruntime都是对mozilla平台的进行扩展，通过这两种方式可以使用c/c++访问系统资源，向mozilla程序提供接口。
+	xpcom组件趋向于被npruntime取代。
+
+	还可以使用Mozilla embedding APIs将mozilla组件内嵌入其他应用程序当中。
+
+mozilla 应用程序
+	一般目录结构如下：
+	app/
+		chrome/
+			content/
+				main.xul
+			locale/				#国际化资源存放位置
+				en-US/
+			chrome.manifest		#同样是chrome资源定义
+		defaults/
+			preferences/
+				prefs.js		#应用程序默认配置，修改xulrunner的默认配置
+		extensions/
+		application.ini			#应用程序配置描述，作者，mozilla要求版本等
+
+
+	应用程序与firefox扩展目录结构基本相同，因为firefox就是基于mozilla平台开发，扩展机制也同样是利用mozilla平台提供的。
+
+	应用程序使用xulrunner运行: xulrunner application.ini
+
+xpcom 组件：
+	通过开发xpcom组件，给于应用程序访问系统资源的方法，以及其他用来扩展xulrunner应用程序的功能。
+	
+	*.idl 描述接口，所有接口都继承自nsISupports，描述中还需要uuid，用来唯一标识这个接口，使用uuidgen程序生成。
+
+	xpidl 程序可以通过idl文件生成，c++头文件和实现文件，还有xpt文件
+
+	*.xpt 是接口的二进制描述文件。提供xulrunner访问接口的速度。
+	
+	*Module.* 是用来实现Module的接口，以让xulrunner调用该组件
+		通过NS_IMPL_NSGETMODULE和nsModuleComponentInfo结构，告知xulrunner，组件对象的注册。
+
+	组件安装
+		最终将生成*.so和xpt文件放入xulrunner/components目录下，如果存在components.list文件，则需要添加文件。
+		组件是否注册会在应用程序的用户配置目录下生成compreg.dat文件
+		！！当出现注册不上时，可尝试删除compreg.dat文件！！
+
+
+使用xpcom组件：
+	 var c = Components.classes["@ccoss.com/desktop;1"].createInstance(); //获得组件实例
+     c = c.QueryInterface(Components.interfaces.nsICcoss); //要使用的接口，因此一个组件可以实现多个接口
+	
+
+
+
+	
+	

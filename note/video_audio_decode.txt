@@ -1,0 +1,58 @@
+音视频编解码基础知识
+
+VBR 动态比特率， 需要容器支持提供音视频的同步方法
+CBR 固定比特率
+HDRIP: 重新编码，再次经过压缩的视频
+REMUX版本：意思是重新封装，从HD-DVD或者BD理提取音视频数据，封装到其他格式如TS或AVI中。
+
+容器
+	AVI：微软的，成熟老技术。不支持VBR，不支持流媒体，因为索引在文件尾部。
+	TS：Transfer stream. ts的每段可以分别解码。包有固定长度。适合传输介质不稳定的状况。常用与电视广播。支持VBR。BD使用TS流
+
+	PS：Program stream. DVD和HDDVD使用ps流。后缀为VOB或EVO等。
+	编码
+
+	MOV封装：QuickTime封装与AVI是同一个时代的。
+	MKV封装：是Matroska的简称。一种新的封装格式，非常开放，支持VBR，提供时间戳来进行音视频同步。支持流媒体。兼容性强。民间开发，商业支持少。
+	FLV：针对与h.263编码家族的格式
+	rmvb/rm: real video
+	MP4：主要用于封装mpeg4.
+
+编码：
+	Mpeg1: VCD使用  352x288，低分辨率，压缩比低
+	Mpeg2: DVD用和电视广播。有NTSC(720x480)和PAL(720x576)。压缩比高于Mpeg1
+
+	Mpeg4: 目前使用最多，avi文件始祖。压缩比提过很多，质量堪比DVD
+	divx: 基于mpeg4开发，有一定算法优化。
+	xvid: 在divx技术封锁后，被人破解开发的。基于mpeg4改进。开放源码。画质更好。
+	h.261： 早期低码率编码，用于352x288和176x144，现在不用了
+	h.263：低码率下比h261效果好。
+	h.263+：h263改进
+	h.264：集中以往有点，高压缩。与h.263+和mpeg4 sp相比，减少50%比特率，高质量应用等。
+	rm/rmvb: real公司应用与网络的高压缩编码。rm是CBR，rmvb是VBR。
+
+
+常见编码容器组合：
+	AVI Xvid MP3
+	AVI Dvix MP3
+	MKV Xvid MP3
+	MKV Xvid AAC
+	MKV H264 AAC
+	MP4 Xvid mp3
+	MP4 H264 AAC
+	3GP H263 AAC
+
+各种编码最佳码率：
+	Real Video: 640x720 350-600 kbps
+	Xvid: 1024x438 800-1300Kbps
+	MKV(X264/AVC)： 720p 5-6Mbps
+	H264/VC1：1080p 30Mbps
+
+ITU-T和ISO/IEC-MPEG 两个数字视频压缩领域内的标准化组织
+
+ITU-T 定制H.26x系列
+ISO/IEC-MPEG 定制了MPEG系列
+
+H.264或称MPEG-4/10 是由ITU-T和ISO/IEC-MPEG共同开发的视频编解码标准。编码技术称为AVC编码。因此常称H.264为H.264/AVC（或者AVC/H.264或者H.264/MPEG-4 AVC或MPEG-4/H.264 AVC）
+
+

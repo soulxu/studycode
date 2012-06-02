@@ -1,0 +1,3 @@
+静态库链接有次序问题
+gcc -I../transmission-2.11/ ./test.c ./btdownloader.o -ltransmission -L../transmission-2.11/libtransmission
+

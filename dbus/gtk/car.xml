@@ -1,0 +1,9 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/soulxu/dbus/qt/car">
+	<interface name="com.soulxu.dbus.qt.car">
+		<method name="startup" />
+		<method name="stop" />
+		<signal name="stoped" />
+	</interface>
+</node>

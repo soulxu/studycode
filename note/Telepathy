@@ -1,0 +1,31 @@
+Telepathy Developer
+
+Mission Control
+Mission Control 提供 Account Manager 和 Channel Dispatcher.
+当前有nokia实现的mission control 5.
+
+Account Manager
+负责维护配置的帐号列表和负责链接到这些账户
+通常，客户端请求可用的Accounts 和 Connections, 并通过Account Manager控制用户在线状态。
+
+Channel Dispatcher
+Channel Dispathcer 负责监听从各种Connections 进入的 Channel 并通知Account Manager 和 分派到适当的Telepathy Client.
+
+Connection Manager
+Connection Manager是connections的一个简单的工厂。仅有很少的需要和client交互。大部分获得管理connections的工作应该通过Account Manager。
+Connection Manager通常只提供Connection Manager的进程。每个链接有自己的D-bus service name。
+
+Client
+客户端是指在Channel Dispatcher上注册，client有三种 Observers Approvers Handlers
+
+Connection
+Connections表示活动的协议会话。每个connection有自己的一组属性
+org.freedesktop.Telepathy.Connection主要是关于handles和channels，还有一组其他的接口，如avatar aliasing persence.
+
+Channel
+Channel被用来再本地应用程序和远程应用程序间交换数据。
+
+Handle
+用来表示各种协议资源，handle用字符串标识。
+
+

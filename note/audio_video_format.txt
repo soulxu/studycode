@@ -1,0 +1,48 @@
+音视频文件的格式与编码是分开的，有容器，有编码方法
+
+人们设定了不同的视频文件格式来把视频和音频放在一个文件中，以方便同时回放，实际上都是一个容器里面 包裹着不同的轨道。容器是用来区分不同文件的数据类型的，而编码格式则由音视频的压缩算法决定，我们一般所说的文件格式或者是后缀名指的就是文件的容器。对于一种容器，可以包含不同编码格式的一种视频和音频。
+
+文件格式（容器）： 
+AVI (*.avi)
+  其含义是Audio Video Interactive，就是把视频和音频编码混合在一起储存，最常见的音频视频容器。支持的视频音频编码也是最多的。AVI也是最长寿的格式，已存在10余年了，虽然发布过改版（V2.0于1996年发布），但已显老态。 
+MPG (*.mpg/*.mpeg/*.dat)
+MPEG编码采用的音频视频容器，具有流的特性。里面又分为 PS，TS 等，PS 主要用于 DVD 存储，TS 主要用于 HDTV。 
+VOB (*.vob)
+ DVD采用的音频视频容器格式（即视频MPEG-2，音频用AC3或者DTS），支持多视频多音轨多字幕章节等。 
+MP4 
+ MPEG-4编码采用的音频视频容器，基于 QuickTime MOV 开发，具有许多先进特性。 
+3GP 
+ 3GPP视频采用的格式，主要用于流媒体传送。 
+ASF (*.wmv/*.asf)
+  Advanced Systems Format，Windows Media 采用的音频视频容器，能够用于流传送，还能包容脚本等。 ASF封装的WMV视频具有“数位版权保护”功能。
+RM (*.rm/*.rmvb)
+ RealMedia 采用的音频视频容器，用于流传送。 由RealNetworks开发的一种容器，它通常只能容纳Real Video和Real Audio编码的媒体。可变比特率的RMVB格式，体积很小，非常受到网络下载者的欢迎。
+MOV (*.mov)
+ QuickTime 的音频视频容器，恐怕也是现今最强大的容器，甚至支持虚拟现实技术，Java 等，它的变种 MP4,3GP都没有这么厉害。 
+MKV 
+  Matroska, MKV 它能把 Windows Media Video，RealVideo，MPEG-4 等视频音频融为一个文件，而且支持多音轨，支持章节字幕等。 开放标准，开源。
+WAV 
+ 一种音频容器（注意：只是音频），大家常说的 WAV 就是没有压缩的 PCM 编码，其实 WAV 里面还可以包括 MP3 等其他 ACM 压缩编码。
+
+TS
+
+MPEG-2 transport stream，用于数字广播等非可靠传输领域，也被蓝光采用。
+ 
+
+目前常见的音视频编码有以下几类
+MPEG系列：（由ISO[国际标准组织机构]下属的MPEG[运动图象专家组]开发 ）
+ 视频编码方面主要是Mpeg1（vcd用的就是它）、Mpeg2（DVD使用）、Mpeg4（现在的DVDRIP使用的都是它的变种，如：divx，xvid等）、Mpeg4 AVC（现在正热门）；
+ 音频编码方面主要是MPEG Audio Layer 1/2、MPEG Audio Layer 3（大名鼎鼎的mp3）、MPEG-2 AAC 、MPEG-4 AAC等等。 注意：DVD音频没有采用Mpeg的 
+H.26X系列：（由ITU[国际电传视讯联盟]主导，侧重网络传输，注意：只是视频编码）
+ 包括H261、H262、H263、H263+、H263++、H264（就是MPEG4 AVC-合作的结晶） 
+微软windows media系列：（牛X公司，能自己定标准啊...）
+ 视频编码有Mpeg-4 v1/v2/v3（基于MPEG4，DIVX3的来源，呵呵）、Windows Media Video 7/8/9/10
+ 音频编码有Windows Media audeo v1/v2/7/8/9 
+Real Media系列：（注意，这里说的Real的编码，可不是rm、rmvb文件，呵呵）
+ 视频编码有RealVideo G2（早期）、RealVideo 8/9/10
+ 音频编码有RealAudio cook/sipro（早期）、RealAudio AAC/AACPlus等 
+QuickTime系列：（是一个平台，有很多编码器）
+ 视频编码有Sorenson Video 3（用于QT5，成标准了）、Apple MPEG-4、Apple H.264 
+ 音频编码有QDesign Music 2、Apple MPEG-4 AAC （这个不错） 
+其它，如：Ogg、On2-vpx、flash vidio：不详述啦。
+特殊说明的，是DVD这种媒介的音频编码，采用了相对独立的几种，就列2个常见的吧：AC3（杜比公司开发）、DTS
